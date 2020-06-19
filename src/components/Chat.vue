@@ -201,7 +201,6 @@ a {
 	padding: 20px 20px 11px 18px;
 }
 .dialog-header{
-	/* text-align: left; */
 	display: flex;
 	flex-flow: row nowrap;
 	justify-content: space-between;
@@ -211,13 +210,11 @@ a {
 	font-size: 14px;
 	line-height: 20px;
 	color: #35383D;
-	font-weight: medium; /* !!!!! */
 }
 .dialog-header__created{
 	font-family: 'TT Norms Medium';
 	font-size: 10px;
 	line-height: 14px;
-	/* identical to box height */
 	text-align: right;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
