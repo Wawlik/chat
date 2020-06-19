@@ -2,7 +2,7 @@
 	<div class="messages-container">
 		<div class="messages">
 			<div class="messages__header">
-				<span>Диалоги</span> <span v-if="dialogs && dialogs.length" class="messages-total">{{dialogs.length || 0}}</span>
+				<span class="messages__header__text1">Диалоги</span> <span v-if="dialogs && dialogs.length" class="messages-total">{{dialogs.length || 0}}</span>
 			</div>
 			<div class="messages__content" :key="change">
 				<div v-for="(one) in dialogs" :key="'dialog-'+one.id" @click="gotoDialog(one.id)" :class="'dialog ' + (cDialog && one.id === cDialog.id ? 'dialog-active':'')">
@@ -16,7 +16,7 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="cDialog" class="cDialog">
+		<div v-if="cDialog && !apiBusy" class="cDialog">
 			<div class="cDialog-list">
 				<div :class="'cDialog-part ' + (getUser() === one.author ? 'cDialog-part-right':'cDialog-part-left')"
 					v-for="(one, index) in cDialog.parts" :key="'cDialog-part-' + index">
@@ -35,6 +35,9 @@
 			</div>
 			<msg-form/>
 		</div>
+		<div v-else-if="apiBusy" class="cDialog">
+			<loader color="#09f" fontS="10px" margin="300px auto" />
+		</div>
 		<div v-else class="noDialog">
 		</div>
 	</div>
@@ -45,18 +48,21 @@
 import Vue from 'vue';
 import mixins from '../mixins';
 import msgForm from './msgForm';
+import loader from './loader.vue';
 
 export default {
 	name: 'Chat',
 	mixins: [mixins],
 	components:{
-		msgForm
+		msgForm,
+		loader
 	},
 	data(){
 		return{
 			dialogs: [],
 			change: 0,
-			cDialog: null
+			cDialog: null,
+			apiBusy: false
 		}
 	},
 	methods:{
@@ -93,8 +99,18 @@ export default {
 		}
 	},
 	watch:{
-		$route(){
-			this.setActiveDialog();
+		$route(newV, oldV){
+			// console.log({oldV});
+			// console.log({newV});
+			let id = newV.params.id;
+			let oid = oldV.params.id;
+			if(id && oid !== id){
+				this.apiBusy = true;
+				setTimeout(() => {
+					this.setActiveDialog();
+					this.apiBusy = false;
+				}, 1500);
+			}
 		}
 	},
 	mounted(){
@@ -119,6 +135,35 @@ li {
 a {
 	color: #42b983;
 }
+@font-face {
+	font-family: 'TT Norms Regular';
+	src: url('../assets/fonts/TTNormsRegular/TTNorms-Regular.eot');
+	src: url('../assets/fonts/TTNormsRegular/TTNorms-Regular.eot?#iefix') format('embedded-opentype'),
+	url('../assets/fonts/TTNormsRegular/TTNorms-Regular.woff') format('woff'),
+	url('../assets/fonts/TTNormsRegular/TTNorms-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'TT Norms Medium';
+	src: url('../assets/fonts/TTNormsMedium/TTNorms-Medium.eot');
+	src: url('../assets/fonts/TTNormsMedium/TTNorms-Medium.eot?#iefix') format('embedded-opentype'),
+	url('../assets/fonts/TTNormsMedium/TTNorms-Medium.woff') format('woff'),
+	url('../assets/fonts/TTNormsMedium/TTNorms-Medium.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'TT Norms Bold';
+	src: url('../assets/fonts/TTNormsBold/TTNorms-Bold.eot');
+	src: url('../assets/fonts/TTNormsBold/TTNorms-Bold.eot?#iefix') format('embedded-opentype'),
+	url('../assets/fonts/TTNormsBold/TTNorms-Bold.woff') format('woff'),
+	url('../assets/fonts/TTNormsBold/TTNorms-Bold.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
 .messages__header{
 	padding: 24px 20px 16px 20px;
 	border-bottom: 1px solid #E9EDF2;
@@ -141,7 +186,7 @@ a {
 	height: 100px;
 	box-sizing: border-box;
 	padding: 20px 20px 11px 20px;
-	font-family: TT Norms;
+	font-family: 'TT Norms Regular';
 	font-style: normal;
 	font-weight: normal;
 	font-size: 13px;
@@ -155,9 +200,6 @@ a {
 	border-left: 2px solid #398BFF;
 	padding: 20px 20px 11px 18px;
 }
-.messages-header{
-	border-bottom: 1px solid #E9EDF2;
-}
 .dialog-header{
 	/* text-align: left; */
 	display: flex;
@@ -165,14 +207,14 @@ a {
 	justify-content: space-between;
 }
 .dialog-header__subject{
-	font-family: TT Norms;
+	font-family: 'TT Norms Medium';
 	font-size: 14px;
 	line-height: 20px;
-	color: #656B77;
+	color: #35383D;
 	font-weight: medium; /* !!!!! */
 }
 .dialog-header__created{
-	font-family: TT Norms;
+	font-family: 'TT Norms Medium';
 	font-size: 10px;
 	line-height: 14px;
 	/* identical to box height */
@@ -183,6 +225,10 @@ a {
 }
 .dialog-content{
 	text-align: left;
+	font-family: 'TT Norms Regular';
+	font-size: 13px;
+	line-height: 18px;
+	color: #7D8790;
 }
 .cDialog-part{
 	width:100%;
@@ -195,7 +241,7 @@ a {
 }
 .cDialog-part__content{
 	display: flex;
-	font-family: TT Norms;
+	font-family: 'TT Norms Regular';
 	font-size: 14px;
 	line-height: 141.62%;
 	margin-bottom: 10px;
@@ -221,13 +267,13 @@ a {
 }
 .cDialog-part__owner{
 	margin-right: 12px;
-	font-family: TT Norms;
+	font-family: 'TT Norms Medium';
 	font-size: 13px;
 	line-height: 141.62%;
 	color: #000000;
 }
 .cDialog-part__created{
-	font-family: TT Norms;
+	font-family: 'TT Norms Medium';
 	font-size: 10px;
 	line-height: 141.62%;
 	color: #B7C0C8;
@@ -248,14 +294,17 @@ a {
 .cDialog-list > :first-child {
     margin-top: auto;
 }
-.messages-header > span:first-child{
-	font-size: 29px;
-}
 .messages-total{
-	font-family: TT Norms;
+	font-family: 'TT Norms Bold';
 	font-size: 14px;
 	line-height: 20px;
 	color: #D2D8DE;
 	margin-left:10px;
+}
+.messages__header__text1{
+	font-family: 'TT Norms Regular';
+	font-size: 14px;
+	line-height: 20px;
+	color: #656B77;
 }
 </style>
