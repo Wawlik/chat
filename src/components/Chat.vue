@@ -68,7 +68,7 @@ export default {
 	methods:{
 		gotoDialog(id){
 			if(id !== this.$route.params.id){
-				this.$router.push('/' + id);
+				this.$router.push('/chat/' + id);
 			}
 		},
 		updDialogs(){
